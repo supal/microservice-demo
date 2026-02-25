@@ -1,15 +1,24 @@
-name: Manual Module Build
+name: Manual Module Selector
 
 on:
-  workflow_dispatch:   # <-- This makes it manual
+  workflow_dispatch:
+    inputs:
+      module:
+        description: "Select which module to build"
+        required: true
+        type: choice
+        options:
+          - eureka-server
+          - api-gateway
+          - customer-service
+          - order-service
 
 jobs:
-
-  eureka-server:
-    name: Build Eureka Server
+  build:
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -17,58 +26,8 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Build Eureka Server
+      - name: Build selected module
         run: |
-          cd eureka-server
-          mvn clean package
-
-  api-gateway:
-    name: Build API Gateway
-    runs-on: self-hosted
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      - name: Build API Gateway
-        run: |
-          cd api-gateway
-          mvn clean package
-
-  customer-service:
-    name: Build Customer Service
-    runs-on: self-hosted
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      - name: Build Customer Service
-        run: |
-          cd customer-service
-          mvn clean package
-
-  order-service:
-    name: Build Order Service
-    runs-on: self-hosted
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
-
-      - name: Build Order Service
-        run: |
-          cd order-service
+          echo "Selected module: ${{ github.event.inputs.module }}"
+          cd ${{ github.event.inputs.module }}
           mvn clean package
