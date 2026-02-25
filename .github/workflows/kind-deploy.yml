@@ -1,0 +1,55 @@
+name: Kind Local Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      module:
+        description: "Select module to deploy"
+        required: true
+        type: choice
+        options:
+          - eureka-server
+          - api-gateway
+          - customer-service
+          - order-service
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Build selected module
+        run: |
+          cd ${{ github.event.inputs.module }}
+          mvn clean package -DskipTests
+
+      - name: Build Docker image locally
+        run: |
+          MODULE=${{ github.event.inputs.module }}
+          IMAGE_NAME="${MODULE}:latest"
+          cd $MODULE
+          docker build -t $IMAGE_NAME .
+
+      - name: Load image into Kind
+        run: |
+          MODULE=${{ github.event.inputs.module }}
+          IMAGE_NAME="${MODULE}:latest"
+          kind load docker-image $IMAGE_NAME --name microservices
+          echo "Loaded image into Kind: $IMAGE_NAME"
+
+      - name: Update deployment image
+        run: |
+          MODULE=${{ github.event.inputs.module }}
+          IMAGE_NAME="${MODULE}:latest"
+          kubectl set image deployment/$MODULE \
+            $MODULE=$IMAGE_NAME
+          kubectl rollout status deployment/$MODULE
