@@ -1,0 +1,74 @@
+name: Manual Module Build
+
+on:
+  workflow_dispatch:   # <-- This makes it manual
+
+jobs:
+
+  eureka-server:
+    name: Build Eureka Server
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Build Eureka Server
+        run: |
+          cd eureka-server
+          mvn clean package
+
+  api-gateway:
+    name: Build API Gateway
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Build API Gateway
+        run: |
+          cd api-gateway
+          mvn clean package
+
+  customer-service:
+    name: Build Customer Service
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Build Customer Service
+        run: |
+          cd customer-service
+          mvn clean package
+
+  order-service:
+    name: Build Order Service
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Build Order Service
+        run: |
+          cd order-service
+          mvn clean package
