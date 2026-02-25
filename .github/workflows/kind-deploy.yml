@@ -33,11 +33,12 @@ jobs:
           mvn clean package -DskipTests
 
       - name: Build Docker image locally
+        shell: bash
         run: |
-          $MODULE = "${{ github.event.inputs.module }}"
-          $IMAGE_NAME = "$MODULE:latest"
-          cd $MODULE
-          docker build -t $IMAGE_NAME .
+          MODULE="${{ github.event.inputs.module }}"
+          IMAGE_NAME="${MODULE}:latest"
+          cd "$MODULE"
+          docker build -t "$IMAGE_NAME" .
 
       - name: Load image into Kind
         run: |
